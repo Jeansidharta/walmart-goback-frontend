@@ -6,16 +6,13 @@ import { useForm } from "@mantine/form";
 import positionJson from "../../assets/positions.json";
 import { ShelfPosition } from "./page";
 
-const positionRegex = /^(\w\d{1,2})\D(\d{1,3})$/;
+const positionRegex = /^(\w\d{1,2})\D+(\d{1,3})\D?(.*)$/;
 
-function parsePosition(
-	positionRaw: string,
-	subshelf: string,
-): ShelfPosition | null {
+function parsePosition(positionRaw: string): ShelfPosition | null {
 	const position = positionRaw.trim();
 	const result = positionRegex.exec(position);
 	if (!result) return null;
-	const [, corridor_raw, shelf] = result;
+	const [, corridor_raw, shelf, subshelf] = result;
 	const corridor =
 		corridor_raw.toUpperCase() as unknown as ShelfPosition["corridor"];
 	const [x, y] = positionJson[corridor]?.average_position ?? [];
@@ -30,7 +27,6 @@ function parsePosition(
 
 type FormData = {
 	position: string;
-	shelfPosition: string;
 	screenshot: string | null;
 };
 
@@ -46,11 +42,10 @@ export const ItemForm: FC<{
 		initialValues: {
 			position: "",
 			screenshot: "",
-			shelfPosition: "",
 		},
 		validate: {
 			position: (pos) => {
-				const result = parsePosition(pos, "");
+				const result = parsePosition(pos);
 				if (!result) return "Invalid position";
 				const { corridor } = result;
 				if (!positionJson[corridor]) {
@@ -68,7 +63,7 @@ export const ItemForm: FC<{
 			return;
 		}
 
-		const position = parsePosition(data.position, data.shelfPosition)!;
+		const position = parsePosition(data.position)!;
 
 		onSubmit({
 			position,
@@ -86,10 +81,6 @@ export const ItemForm: FC<{
 						label="Position"
 						{...form.getInputProps("position")}
 						required
-					/>
-					<TextInput
-						label="Shelf Position"
-						{...form.getInputProps("shelfPosition")}
 					/>
 					<WebcamCapture {...form.getInputProps("screenshot")} />
 					<Button type="submit">Add item</Button>
