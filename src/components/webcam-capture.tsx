@@ -57,7 +57,8 @@ export const WebcamCapture: FC<{
 				<div
 					style={{
 						position: "relative",
-						left: "calc(100% - 40px)",
+						marginLeft: "100%",
+						right: "40px",
 						bottom: 40,
 					}}
 				>

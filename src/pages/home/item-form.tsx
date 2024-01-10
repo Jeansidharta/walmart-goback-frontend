@@ -3,36 +3,36 @@ import { Button, Paper, Stack, TextInput } from "@mantine/core";
 import { WebcamCapture } from "../../components/webcam-capture";
 import { useForm } from "@mantine/form";
 
-import positionJson from "../../assets/positions.json";
-import { ShelfPosition } from "./page";
+import { ShelfLocation } from "../../models";
+import { isShelfLocationImplemented } from "../../utils/shelf-location";
 
-const positionRegex = /^(\w\d{1,2})\D+(\d{1,3})\D?(.*)$/;
+const positionRegex = /^(\w)(\d{1,2})\D+(\d{1,3})\D?(\d*)$/;
 
-function parsePosition(positionRaw: string): ShelfPosition | null {
+function parseLocation(positionRaw: string): ShelfLocation | null {
 	const position = positionRaw.trim();
 	const result = positionRegex.exec(position);
 	if (!result) return null;
-	const [, corridor_raw, shelf, subshelf] = result;
-	const corridor =
-		corridor_raw.toUpperCase() as unknown as ShelfPosition["corridor"];
-	const [x, y] = positionJson[corridor]?.average_position ?? [];
+	const [, section_raw, corridor_raw, shelf_raw, subshelf_raw] = result;
+	const section = section_raw.toUpperCase();
+	const corridor = Number(corridor_raw);
+	const shelf = Number(shelf_raw);
+	const subshelf = subshelf_raw ? Number(subshelf_raw) : undefined;
 	return {
+		section,
 		corridor,
 		shelf,
 		subshelf,
-		x,
-		y,
 	};
 }
 
 type FormData = {
-	position: string;
-	screenshot: string | null;
+	shelfLocation: string;
+	photo: string | null;
 };
 
 type FormSubmit = {
-	position: ShelfPosition;
-	screenshot: string;
+	shelfLocation: ShelfLocation;
+	photo: string;
 };
 
 export const ItemForm: FC<{
@@ -40,20 +40,18 @@ export const ItemForm: FC<{
 }> = ({ onSubmit }) => {
 	const form = useForm<FormData>({
 		initialValues: {
-			position: "",
-			screenshot: "",
+			shelfLocation: "",
+			photo: "",
 		},
 		validate: {
-			position: (pos) => {
-				const result = parsePosition(pos);
+			shelfLocation: (pos) => {
+				const result = parseLocation(pos);
 				if (!result) return "Invalid position";
-				const { corridor } = result;
-				if (!positionJson[corridor]) {
+				if (!isShelfLocationImplemented(result)) {
 					return "This corridor was not implemented";
 				}
 			},
-			screenshot: (screenshot) =>
-				screenshot ? null : "You must take a picture",
+			photo: (photo) => (photo ? null : "You must take a picture"),
 		},
 	});
 
@@ -63,11 +61,11 @@ export const ItemForm: FC<{
 			return;
 		}
 
-		const position = parsePosition(data.position)!;
+		const position = parseLocation(data.shelfLocation)!;
 
 		onSubmit({
-			position,
-			screenshot: data.screenshot!,
+			shelfLocation: position,
+			photo: data.photo!,
 		});
 
 		form.reset();
@@ -79,10 +77,10 @@ export const ItemForm: FC<{
 				<Stack gap="xs">
 					<TextInput
 						label="Position"
-						{...form.getInputProps("position")}
+						{...form.getInputProps("shelfLocation")}
 						required
 					/>
-					<WebcamCapture {...form.getInputProps("screenshot")} />
+					<WebcamCapture {...form.getInputProps("photo")} />
 					<Button type="submit">Add item</Button>
 				</Stack>
 			</Paper>

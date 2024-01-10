@@ -4,6 +4,13 @@ import { FC, ReactNode } from "react";
 const theme = createTheme({
 	primaryColor: "pink",
 	black: "background",
+	shadows: {
+		xs: "2px 2px 2px rgba(0, 0, 0, 0.4)",
+		sm: "4px 4px 4px rgba(0, 0, 0, 0.4)",
+		md: "8px 8px 8px rgba(0, 0, 0, 0.4)",
+		lg: "12px 12px 12px rgba(0, 0, 0, 0.4)",
+		xl: "16px 16px 16px rgba(0, 0, 0, 0.4)",
+	},
 	colors: {
 		pink: [
 			"#ffe8ff",

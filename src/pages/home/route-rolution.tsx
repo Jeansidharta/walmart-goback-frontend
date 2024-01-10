@@ -10,14 +10,14 @@ import {
 	Space,
 	ActionIcon,
 } from "@mantine/core";
-import { Item } from "./page";
-import { shelfPositionString } from "../../utils";
 import {
 	IconEdit,
 	IconCheck,
 	IconArrowBackUp,
 	IconRefresh,
 } from "@tabler/icons-react";
+import { Item } from "../../models";
+import { shelfLocationString } from "../../utils/shelf-location";
 
 export const RouteSolution: FC<{
 	solution: Item[];
@@ -63,7 +63,7 @@ export const RouteSolution: FC<{
 						{notVisited.length > 0 && (
 							<>
 								<Title order={2}>Not delivered</Title>
-								{notVisited.map(([{ position }, itemIndex]) => (
+								{notVisited.map(([{ shelfLocation: position }, itemIndex]) => (
 									<Paper
 										style={{ width: "100%" }}
 										p="sm"
@@ -71,7 +71,7 @@ export const RouteSolution: FC<{
 										key={itemIndex}
 									>
 										<Group justify="space-between">
-											{shelfPositionString(position)}
+											{shelfLocationString(position)}
 											<ActionIcon color="blue" onClick={() => visit(itemIndex)}>
 												<IconCheck />
 											</ActionIcon>
@@ -83,7 +83,7 @@ export const RouteSolution: FC<{
 						{visited.length > 0 && (
 							<>
 								<Title order={2}>Delivered</Title>
-								{visited.map(([{ position }, itemIndex]) => (
+								{visited.map(([{ shelfLocation: position }, itemIndex]) => (
 									<Paper
 										style={{ width: "100%" }}
 										p="sm"
@@ -93,7 +93,7 @@ export const RouteSolution: FC<{
 										<Group justify="space-between">
 											<Group>
 												<IconCheck />
-												{shelfPositionString(position)}
+												{shelfLocationString(position)}
 											</Group>
 											<ActionIcon
 												color="blue"
@@ -111,19 +111,14 @@ export const RouteSolution: FC<{
 						{nextItem ? (
 							<Stack>
 								<Title order={2}>Next Item</Title>
-								<Text>{shelfPositionString(nextItem.position)}</Text>
+								<Text>{shelfLocationString(nextItem.shelfLocation)}</Text>
 
 								<Group
 									align="center"
 									justify="center"
 									style={{ width: 200, height: 200 }}
 								>
-									<Image
-										fit="contain"
-										src={nextItem.screenshot}
-										h={200}
-										w={200}
-									/>
+									<Image fit="contain" src={nextItem.photo} h={200} w={200} />
 								</Group>
 								<Button onClick={() => visit(nextItemIndex)}>
 									Delivered <Space w="sm" /> <IconCheck />

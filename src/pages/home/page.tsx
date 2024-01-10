@@ -16,29 +16,15 @@ import {
 } from "@mantine/core";
 import { IconTrash, IconMap } from "@tabler/icons-react";
 import { ItemForm } from "./item-form";
-import positions from "../../assets/positions.json";
 import { RouteSolution } from "./route-rolution";
-import { shelfPositionString } from "../../utils";
 import { useLocalStorage } from "../../utils/use-local-storage";
-
-export type ShelfPosition = {
-	corridor: keyof typeof positions;
-	shelf: string;
-	subshelf: string;
-	x: number;
-	y: number;
-};
-
-export type Item = {
-	position: ShelfPosition;
-	screenshot: string;
-};
-
-function shelfPositionToCoords(shelfPosition: ShelfPosition) {
-	const corridor = positions[shelfPosition.corridor];
-	const [x, y] = corridor.average_position;
-	return Position.new(x, y);
-}
+import { ShareButton } from "./share-button";
+import { Item } from "../../models";
+import {
+	shelfLocationString,
+	shelfLocationToPosition,
+} from "../../utils/shelf-location";
+import { CartsModal } from "./carts-modal";
 
 export const HomePage: FC = () => {
 	const [solution, setSolution] = useState<Item[] | null>(null);
@@ -51,7 +37,10 @@ export const HomePage: FC = () => {
 
 	function traceRoute() {
 		const solution_raw = tspSolve(
-			items.map((item) => shelfPositionToCoords(item.position)),
+			items.map((item) => {
+				const { x, y } = shelfLocationToPosition(item.shelfLocation)!;
+				return Position.new(x, y);
+			}),
 		);
 		const solution: Item[] = [];
 		solution_raw.forEach((num) => solution.push(items[num]));
@@ -73,7 +62,17 @@ export const HomePage: FC = () => {
 				/>
 			) : (
 				<Group align="start" justify="center" style={{ rowGap: 32 }}>
-					<ItemForm onSubmit={(newItem) => setItems([newItem, ...items])} />
+					<ItemForm
+						onSubmit={(newItem) =>
+							setItems([
+								{
+									...newItem,
+									...shelfLocationToPosition(newItem.shelfLocation)!,
+								},
+								...items,
+							])
+						}
+					/>
 					<Container size={350} style={{ width: "100%" }}>
 						<Stack style={{ width: "100%" }}>
 							{items.length > 0 && (
@@ -81,23 +80,36 @@ export const HomePage: FC = () => {
 									Trace Route <Space w="sm" /> <IconMap />
 								</Button>
 							)}
-							{items.length == 0 && <Text>No items yet</Text>}
-							{items.map((item, index) => (
-								<Paper
-									style={{ width: "100%" }}
-									p="sm"
-									withBorder
-									key={item.position.corridor + "-" + item.position.shelf}
-								>
-									<Group justify="space-between">
-										{shelfPositionString(item.position)}
+							{items.length == 0 ? (
+								<>
+									<Text>No items yet</Text>
+									<CartsModal onScan={(newItems) => setItems(newItems)} />
+								</>
+							) : (
+								<>
+									{items.map((item, index) => (
+										<Paper
+											style={{ width: "100%" }}
+											p="sm"
+											withBorder
+											key={
+												item.shelfLocation.corridor +
+												"-" +
+												item.shelfLocation.shelf
+											}
+										>
+											<Group justify="space-between">
+												{shelfLocationString(item.shelfLocation)}
+												<ActionIcon onClick={() => removeItem(index)}>
+													<IconTrash style={{ width: "70%", height: "70%" }} />
+												</ActionIcon>
+											</Group>
+										</Paper>
+									))}
 
-										<ActionIcon onClick={() => removeItem(index)}>
-											<IconTrash style={{ width: "70%", height: "70%" }} />
-										</ActionIcon>
-									</Group>
-								</Paper>
-							))}
+									<ShareButton items={items} />
+								</>
+							)}
 						</Stack>
 					</Container>
 				</Group>
