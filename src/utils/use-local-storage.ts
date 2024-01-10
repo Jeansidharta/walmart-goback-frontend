@@ -4,7 +4,7 @@ import { useUpdateEffect } from "./use-update-effect";
 export function useLocalStorage<T extends object>(
 	key: string,
 	initialValue: T,
-): [T, (state: T) => void] {
+): [T, (state: T | ((s: T) => T)) => void] {
 	const [state, setState] = useState<T>(() => {
 		const itemInStorage = localStorage.getItem(key);
 		if (itemInStorage) {

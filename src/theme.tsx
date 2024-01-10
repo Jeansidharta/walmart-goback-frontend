@@ -12,6 +12,18 @@ const theme = createTheme({
 		xl: "16px 16px 16px rgba(0, 0, 0, 0.4)",
 	},
 	colors: {
+		secondary: [
+			"#deffff",
+			"#caffff",
+			"#99fcff",
+			"#64faff",
+			"#3df9ff",
+			"#26f8ff",
+			"#09f7ff",
+			"#00dce3",
+			"#00c4ca",
+			"#00aab0",
+		],
 		pink: [
 			"#ffe8ff",
 			"#ffcffe",

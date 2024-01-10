@@ -31,8 +31,7 @@ export const HomePage: FC = () => {
 	const [items, setItems] = useLocalStorage<Item[]>("scanned-items", []);
 
 	function removeItem(index: number) {
-		const newItems = items.filter((_, i) => i != index);
-		setItems(newItems);
+		setItems((items) => items.filter((_, i) => i !== index));
 	}
 
 	function traceRoute() {
@@ -75,39 +74,41 @@ export const HomePage: FC = () => {
 					/>
 					<Container size={350} style={{ width: "100%" }}>
 						<Stack style={{ width: "100%" }}>
-							{items.length > 0 && (
-								<Button onClick={traceRoute}>
-									Trace Route <Space w="sm" /> <IconMap />
-								</Button>
-							)}
-							{items.length == 0 ? (
+							{items.length === 0 ? (
 								<>
 									<Text>No items yet</Text>
 									<CartsModal onScan={(newItems) => setItems(newItems)} />
 								</>
 							) : (
 								<>
+									<Group justify="center">
+										<Text style={{ textAlign: "center" }}>
+											You have {items.length} Items
+										</Text>
+										<ShareButton items={items} />
+									</Group>
+									<Button onClick={traceRoute}>
+										Trace Route <Space w="sm" /> <IconMap />
+									</Button>
 									{items.map((item, index) => (
 										<Paper
 											style={{ width: "100%" }}
 											p="sm"
 											withBorder
-											key={
-												item.shelfLocation.corridor +
-												"-" +
-												item.shelfLocation.shelf
-											}
+											key={index}
 										>
 											<Group justify="space-between">
 												{shelfLocationString(item.shelfLocation)}
-												<ActionIcon onClick={() => removeItem(index)}>
+												<ActionIcon
+													color="secondary"
+													variant="outline"
+													onClick={() => removeItem(index)}
+												>
 													<IconTrash style={{ width: "70%", height: "70%" }} />
 												</ActionIcon>
 											</Group>
 										</Paper>
 									))}
-
-									<ShareButton items={items} />
 								</>
 							)}
 						</Stack>

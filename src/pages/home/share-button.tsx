@@ -1,5 +1,12 @@
 import { FC, useState } from "react";
-import { ActionIcon, Button, Modal, Stack, TextInput } from "@mantine/core";
+import {
+	ActionIcon,
+	Button,
+	Modal,
+	Stack,
+	TextInput,
+	Text,
+} from "@mantine/core";
 import { IconShare } from "@tabler/icons-react";
 import { fetcher } from "../../utils/fetcher";
 import { useForm } from "@mantine/form";
@@ -43,24 +50,36 @@ export const ShareButton: FC<{ items: Item[] }> = ({ items }) => {
 
 	return (
 		<>
-			<ActionIcon onClick={() => setIsOpen(true)}>
+			<ActionIcon
+				color="secondary"
+				variant="outline"
+				onClick={() => setIsOpen(true)}
+			>
 				<IconShare style={{ width: "70%", height: "70%" }} />
 			</ActionIcon>
 
 			<Modal
 				opened={isOpen}
 				onClose={() => setIsOpen(false)}
-				title="Share Cart"
+				title="You're sharing your cart"
 				closeOnClickOutside={false}
 			>
 				{cartId ? (
 					<QRCodeSVG
 						value={cartId}
-						style={{ width: "100%", height: "max-content", backgroundColor: "white", padding: "16px" }}
+						style={{
+							width: "100%",
+							height: "max-content",
+							backgroundColor: "white",
+							padding: "16px",
+						}}
 					/>
 				) : (
 					<form onSubmit={form.onSubmit(handleSubmit)}>
 						<Stack>
+							<Text>
+								This cart has <strong>{items.length}</strong> items
+							</Text>
 							<TextInput
 								label="Cart Name"
 								{...form.getInputProps("name")}

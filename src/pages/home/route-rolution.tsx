@@ -9,6 +9,7 @@ import {
 	Image,
 	Space,
 	ActionIcon,
+	Divider,
 } from "@mantine/core";
 import {
 	IconEdit,
@@ -39,7 +40,7 @@ export const RouteSolution: FC<{
 		setVisitedDict({});
 	}, [solution, setVisitedDict]);
 
-	const [visited, notVisited] = useMemo(() => {
+	const [visited, notVisited, alsoInThisIsle] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
 		solution.forEach((item, index) => {
@@ -49,7 +50,22 @@ export const RouteSolution: FC<{
 				notVisitedItems.push([item, index] as const);
 			}
 		});
-		return [visitedItems, notVisitedItems] as const;
+
+		const alsoInThisIsle: [Item, number][] = [];
+		for (let i = 0; i < notVisitedItems.length; i++) {
+			const [item, index] = notVisitedItems[i];
+			if (i === 0) continue;
+			if (
+				item.shelfLocation.section ===
+				notVisitedItems[0][0].shelfLocation.section &&
+				item.shelfLocation.corridor ===
+				notVisitedItems[0][0].shelfLocation.corridor
+			) {
+				alsoInThisIsle.push([item, index]);
+			}
+		}
+
+		return [visitedItems, notVisitedItems, alsoInThisIsle] as const;
 	}, [solution, visitedDict]);
 
 	const [nextItem, nextItemIndex] =
@@ -57,61 +73,16 @@ export const RouteSolution: FC<{
 
 	return (
 		<Stack>
-			<Paper shadow="xl" withBorder p="md">
-				<Group wrap="nowrap" align="start">
-					<Stack style={{ width: "100%" }}>
-						{notVisited.length > 0 && (
-							<>
-								<Title order={2}>Not delivered</Title>
-								{notVisited.map(([{ shelfLocation: position }, itemIndex]) => (
-									<Paper
-										style={{ width: "100%" }}
-										p="sm"
-										withBorder
-										key={itemIndex}
-									>
-										<Group justify="space-between">
-											{shelfLocationString(position)}
-											<ActionIcon color="blue" onClick={() => visit(itemIndex)}>
-												<IconCheck />
-											</ActionIcon>
-										</Group>
-									</Paper>
-								))}
-							</>
-						)}
-						{visited.length > 0 && (
-							<>
-								<Title order={2}>Delivered</Title>
-								{visited.map(([{ shelfLocation: position }, itemIndex]) => (
-									<Paper
-										style={{ width: "100%" }}
-										p="sm"
-										withBorder
-										key={itemIndex}
-									>
-										<Group justify="space-between">
-											<Group>
-												<IconCheck />
-												{shelfLocationString(position)}
-											</Group>
-											<ActionIcon
-												color="blue"
-												onClick={() => unvisit(itemIndex)}
-											>
-												<IconArrowBackUp />
-											</ActionIcon>
-										</Group>
-									</Paper>
-								))}
-							</>
-						)}
-					</Stack>
-					<Paper withBorder style={{ height: "100%" }} p="md">
+			<Group justify="center" align="start">
+				<Stack>
+					<Paper withBorder p="md">
 						{nextItem ? (
 							<Stack>
 								<Title order={2}>Next Item</Title>
-								<Text>{shelfLocationString(nextItem.shelfLocation)}</Text>
+								<Text>
+									Location:{" "}
+									<strong>{shelfLocationString(nextItem.shelfLocation)}</strong>
+								</Text>
 
 								<Group
 									align="center"
@@ -123,6 +94,23 @@ export const RouteSolution: FC<{
 								<Button onClick={() => visit(nextItemIndex)}>
 									Delivered <Space w="sm" /> <IconCheck />
 								</Button>
+								{alsoInThisIsle.length > 0 && (
+									<>
+										<Divider />
+										<Title order={3}>Also in this isle...</Title>
+										{alsoInThisIsle.map(([item]) => (
+											<>
+												<Text>
+													Location:{" "}
+													<strong>
+														{shelfLocationString(nextItem.shelfLocation)}
+													</strong>
+												</Text>
+												<Image fit="contain" src={item.photo} h={200} w={200} />
+											</>
+										))}
+									</>
+								)}
 							</Stack>
 						) : (
 							<>
@@ -136,11 +124,60 @@ export const RouteSolution: FC<{
 							</>
 						)}
 					</Paper>
-				</Group>
-			</Paper>
-			<Button onClick={onEditItems}>
-				Change Items <Space w="sm" /> <IconEdit />
-			</Button>
+					<Button color="secondary" variant="outline" onClick={onEditItems}>
+						Change Items <Space w="sm" /> <IconEdit />
+					</Button>
+				</Stack>
+				<Stack style={{ maxWidth: 250, width: "100%" }}>
+					{notVisited.length > 0 && (
+						<>
+							<Title order={2}>Not delivered</Title>
+							{notVisited.map(([{ shelfLocation: position }, itemIndex]) => (
+								<Paper
+									style={{ width: "100%" }}
+									p="sm"
+									withBorder
+									key={itemIndex}
+								>
+									<Group justify="space-between">
+										{shelfLocationString(position)}
+										<ActionIcon
+											color="secondary"
+											variant="outline"
+											onClick={() => visit(itemIndex)}
+										>
+											<IconCheck />
+										</ActionIcon>
+									</Group>
+								</Paper>
+							))}
+						</>
+					)}
+					{visited.length > 0 && (
+						<>
+							<Title order={2}>Delivered</Title>
+							{visited.map(([{ shelfLocation: position }, itemIndex]) => (
+								<Paper
+									style={{ width: "100%" }}
+									p="sm"
+									withBorder
+									key={itemIndex}
+								>
+									<Group justify="space-between">
+										<Group>
+											<IconCheck />
+											{shelfLocationString(position)}
+										</Group>
+										<ActionIcon color="blue" onClick={() => unvisit(itemIndex)}>
+											<IconArrowBackUp />
+										</ActionIcon>
+									</Group>
+								</Paper>
+							))}
+						</>
+					)}
+				</Stack>
+			</Group>
 		</Stack>
 	);
 };
