@@ -19,9 +19,10 @@ import {
 } from "@tabler/icons-react";
 import { Item } from "../../models";
 import { shelfLocationString } from "../../utils/shelf-location";
+import { Solution } from "./page";
 
 export const RouteSolution: FC<{
-	solution: Item[];
+	solution: Solution;
 	onRestart: () => void;
 	onEditItems: () => void;
 }> = ({ solution, onRestart, onEditItems }) => {
@@ -43,7 +44,7 @@ export const RouteSolution: FC<{
 	const [visited, notVisited, alsoInThisIsle] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
-		solution.forEach((item, index) => {
+		solution.forEach(([item], index) => {
 			if (visitedDict[index]) {
 				visitedItems.push([item, index] as const);
 			} else {

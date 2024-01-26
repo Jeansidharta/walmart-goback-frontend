@@ -1,23 +1,35 @@
 import { ShelfLocation } from "../models";
-import positionJson from "../assets/positions.json";
+import { positionsJson } from "./typed-positions";
 
 function fullCorridorName(location: ShelfLocation) {
-	return (location.section +
-		location.corridor.toString()) as unknown as keyof typeof positionJson;
+	return location.section + location.corridor.toString();
+}
+
+export function shelfLocationToProjection(location: ShelfLocation) {
+	const corridor = positionsJson[fullCorridorName(location)];
+	const {
+		point: { x, y },
+		t,
+		connection,
+	} = corridor?.shelves[location.shelf]?.route_projection ?? { point: {} };
+
+	if (typeof x !== "number" || typeof y !== "number") return null;
+	return { x, y, connection, t };
 }
 
 export function shelfLocationToPosition(
 	location: ShelfLocation,
 ): { x: number; y: number } | null {
-	const [x, y] =
-		positionJson[fullCorridorName(location)]?.average_position ?? [];
+	const corridor = positionsJson[fullCorridorName(location)];
+	const { x, y } =
+		corridor?.shelves[location.shelf] ?? corridor?.average_position ?? {};
 
 	if (typeof x !== "number" || typeof y !== "number") return null;
 	return { x, y };
 }
 
 export function isShelfLocationImplemented(location: ShelfLocation): boolean {
-	return Boolean(positionJson[fullCorridorName(location)]);
+	return Boolean(positionsJson[fullCorridorName(location)]);
 }
 
 export function shelfLocationString(location: ShelfLocation) {

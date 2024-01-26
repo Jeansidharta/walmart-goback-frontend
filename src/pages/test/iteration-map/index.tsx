@@ -15,18 +15,19 @@ import {
 
 export const IterationMap: FC = () => {
 	const [speed, setSpeed] = useState<number>(500);
-	const [isPlaying, setIsPlaying] = useState<boolean>(true);
+	const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
 	const allPoints = useMemo(() => {
 		const corridors = Object.values(positions);
 		return corridors
 			.flatMap((corridor) =>
-				corridor.shelves.map(({ corridor_name, shelf_name, x, y }) => ({
-					name: `${corridor_name}-${shelf_name}`,
-					section_name: corridor_name[0],
-					section_number: Number(corridor_name.substring(1)),
-					corridor_name,
-					shelf_name: Number(shelf_name),
+				Object.values(corridor.shelves).map(({ corridor, shelf, x, y }) => ({
+					name: `${corridor}-${shelf}`,
+					section_name: corridor[0],
+					section_number: Number(corridor.substring(1)),
+					corridor_name: corridor,
+					shelf_name: Number(shelf),
+					radius: 10,
 					x,
 					y,
 				})),

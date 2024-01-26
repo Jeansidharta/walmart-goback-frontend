@@ -1,8 +1,9 @@
 import { FC, useState } from "react";
 import { SolutionMap } from "./solution-map";
 import {
+	Connection,
+	Vec2,
 	solve as tspSolve,
-	Position,
 } from "../../../tsp-pkg/travelling_salesman";
 import {
 	ActionIcon,
@@ -23,11 +24,16 @@ import { Item } from "../../models";
 import {
 	shelfLocationString,
 	shelfLocationToPosition,
+	shelfLocationToProjection,
 } from "../../utils/shelf-location";
 import { CartsModal } from "./carts-modal";
+import route from "../../assets/route.json";
+import { Point } from "../../components/map";
+
+export type Solution = [Item, Point, Point[]][];
 
 export const HomePage: FC = () => {
-	const [solution, setSolution] = useState<Item[] | null>(null);
+	const [solution, setSolution] = useState<Solution | null>(null);
 	const [items, setItems] = useLocalStorage<Item[]>("scanned-items", []);
 
 	function removeItem(index: number) {
@@ -35,14 +41,70 @@ export const HomePage: FC = () => {
 	}
 
 	function traceRoute() {
+		const target_points: number[] = [];
+
+		const route_points = [...route.points];
+		const route_connections = [...route.connections];
+
+		const new_points_dict: Record<
+			string,
+			{ x: number; y: number; c1: number; c2: number; t: number }[]
+		> = {};
+
+		items.forEach((item) => {
+			const { x, y, connection, t } = shelfLocationToProjection(
+				item.shelfLocation,
+			)!;
+			let c1 = connection.i1;
+			let c2 = connection.i2;
+			if (c2 < c1) {
+				c1 = connection.i2;
+				c2 = connection.i1;
+			}
+			const key = `${c1}-${c2}`;
+			if (new_points_dict[key]) {
+				new_points_dict[key].push({ x, y, c1, c2, t });
+			} else {
+				new_points_dict[key] = [{ x, y, c1, c2, t }];
+			}
+		});
+		Object.values(new_points_dict).forEach((isleItems) => {
+			isleItems
+				.sort((i1, i2) => i1.t - i2.t)
+				.forEach(({ x, y, c1, c2 }, index) => {
+					route_points.push(Vec2.new(x, y));
+					target_points.push(route_points.length - 1);
+					if (index === 0) {
+						route_connections.push({ i1: c1, i2: route_points.length - 1 });
+					} else {
+						route_connections.push({
+							i1: route_points.length - 2,
+							i2: route_points.length - 1,
+						});
+					}
+					if (index === isleItems.length - 1) {
+						route_connections.push({ i1: route_points.length - 1, i2: c2 });
+					}
+				});
+		});
+
 		const solution_raw = tspSolve(
-			items.map((item) => {
-				const { x, y } = shelfLocationToPosition(item.shelfLocation)!;
-				return Position.new(x, y);
-			}),
+			route_points.map(({ x, y }) => Vec2.new(x, y)),
+			route_connections.map(({ i1, i2 }) => Connection.new(i1, i2)),
+			route.start,
+			Uint32Array.from(target_points),
 		);
-		const solution: Item[] = [];
-		solution_raw.forEach((num) => solution.push(items[num]));
+		const solution: Solution = [];
+		solution_raw.forEach(([num, path]) => {
+			const path2 = (path as number[]).map((i) => route_points[i]);
+
+			const item = items[num - route.points.length];
+			solution.push([
+				item,
+				shelfLocationToPosition(item.shelfLocation)!,
+				path2,
+			]);
+		});
 
 		setSolution(solution);
 	}

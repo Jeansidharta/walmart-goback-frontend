@@ -49,8 +49,9 @@ export const CartsModal: FC<{ onScan: (newItems: Item[]) => void }> = ({
 				}),
 			);
 			setError("");
-		} catch {
-			setError("Failed to retrieve cart");
+		} catch (e) {
+			console.error(e);
+			setError("Failed to retrieve cart: " + e);
 		} finally {
 			setIsLoading(false);
 		}
