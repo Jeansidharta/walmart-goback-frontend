@@ -78,7 +78,7 @@ export const AllPointsMap: FC = () => {
 				width: 1,
 			} as Line;
 		});
-	}, [projections, showPath]);
+	}, [showPath]);
 
 	return (
 		<Stack>

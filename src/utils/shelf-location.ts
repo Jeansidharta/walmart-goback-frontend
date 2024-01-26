@@ -11,7 +11,8 @@ export function shelfLocationToProjection(location: ShelfLocation) {
 		point: { x, y },
 		t,
 		connection,
-	} = corridor?.shelves[location.shelf]?.route_projection ?? { point: {} };
+	} = corridor?.shelves[location.shelf]?.route_projection ??
+	corridor.route_projection ?? { point: {} };
 
 	if (typeof x !== "number" || typeof y !== "number") return null;
 	return { x, y, connection, t };
@@ -28,8 +29,14 @@ export function shelfLocationToPosition(
 	return { x, y };
 }
 
-export function isShelfLocationImplemented(location: ShelfLocation): boolean {
+export function isCorridorImplemented(location: ShelfLocation): boolean {
 	return Boolean(positionsJson[fullCorridorName(location)]);
+}
+
+export function isShelfLocationImplemented(location: ShelfLocation): boolean {
+	return Boolean(
+		positionsJson[fullCorridorName(location)]?.shelves[location.shelf],
+	);
 }
 
 export function shelfLocationString(location: ShelfLocation) {
@@ -38,4 +45,23 @@ export function shelfLocationString(location: ShelfLocation) {
 		res += "-" + location.subshelf;
 	}
 	return res;
+}
+
+const positionRegex = /^(\w)(\d{1,2})\D+(\d{1,3})\D?(\d*)$/;
+
+export function stringToLocation(str: string): null | ShelfLocation {
+	const position = str.trim();
+	const result = positionRegex.exec(position);
+	if (!result) return null;
+	const [, section_raw, corridor_raw, shelf_raw, subshelf_raw] = result;
+	const section = section_raw.toUpperCase();
+	const corridor = Number(corridor_raw);
+	const shelf = Number(shelf_raw);
+	const subshelf = subshelf_raw ? Number(subshelf_raw) : undefined;
+	return {
+		section,
+		corridor,
+		shelf,
+		subshelf,
+	};
 }

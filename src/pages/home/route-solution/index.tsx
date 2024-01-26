@@ -1,25 +1,20 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import {
-	Text,
 	Group,
 	Paper,
 	Stack,
 	Title,
 	Button,
-	Image,
 	Space,
-	ActionIcon,
 	Divider,
+	Accordion,
 } from "@mantine/core";
-import {
-	IconEdit,
-	IconCheck,
-	IconArrowBackUp,
-	IconRefresh,
-} from "@tabler/icons-react";
-import { Item } from "../../models";
-import { shelfLocationString } from "../../utils/shelf-location";
-import { Solution } from "./page";
+import { IconEdit, IconCheck, IconRefresh } from "@tabler/icons-react";
+import { Item } from "../../../models";
+import { Solution } from "../page";
+import { SolutionMap } from "../solution-map";
+import { NextItemCard } from "./next-item-card";
+import { ItemSmall } from "../../../components/item-small";
 
 export const RouteSolution: FC<{
 	solution: Solution;
@@ -44,7 +39,7 @@ export const RouteSolution: FC<{
 	const [visited, notVisited, alsoInThisIsle] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
-		solution.forEach(([item], index) => {
+		solution.route.forEach(({ item }, index) => {
 			if (visitedDict[index]) {
 				visitedItems.push([item, index] as const);
 			} else {
@@ -74,24 +69,14 @@ export const RouteSolution: FC<{
 
 	return (
 		<Stack>
+			<SolutionMap solution={solution} currentIndex={nextItemIndex ?? 0} />
 			<Group justify="center" align="start">
 				<Stack>
 					<Paper withBorder p="md">
 						{nextItem ? (
 							<Stack>
 								<Title order={2}>Next Item</Title>
-								<Text>
-									Location:{" "}
-									<strong>{shelfLocationString(nextItem.shelfLocation)}</strong>
-								</Text>
-
-								<Group
-									align="center"
-									justify="center"
-									style={{ width: 200, height: 200 }}
-								>
-									<Image fit="contain" src={nextItem.photo} h={200} w={200} />
-								</Group>
+								<NextItemCard item={nextItem} />
 								<Button onClick={() => visit(nextItemIndex)}>
 									Delivered <Space w="sm" /> <IconCheck />
 								</Button>
@@ -100,15 +85,7 @@ export const RouteSolution: FC<{
 										<Divider />
 										<Title order={3}>Also in this isle...</Title>
 										{alsoInThisIsle.map(([item]) => (
-											<>
-												<Text>
-													Location:{" "}
-													<strong>
-														{shelfLocationString(nextItem.shelfLocation)}
-													</strong>
-												</Text>
-												<Image fit="contain" src={item.photo} h={200} w={200} />
-											</>
+											<NextItemCard item={item} />
 										))}
 									</>
 								)}
@@ -131,51 +108,46 @@ export const RouteSolution: FC<{
 				</Stack>
 				<Stack style={{ maxWidth: 250, width: "100%" }}>
 					{notVisited.length > 0 && (
-						<>
-							<Title order={2}>Not delivered</Title>
-							{notVisited.map(([{ shelfLocation: position }, itemIndex]) => (
-								<Paper
-									style={{ width: "100%" }}
-									p="sm"
-									withBorder
-									key={itemIndex}
-								>
-									<Group justify="space-between">
-										{shelfLocationString(position)}
-										<ActionIcon
-											color="secondary"
-											variant="outline"
-											onClick={() => visit(itemIndex)}
-										>
-											<IconCheck />
-										</ActionIcon>
-									</Group>
-								</Paper>
-							))}
-						</>
+						<Accordion>
+							<Accordion.Item value="0">
+								<Accordion.Control>
+									<Title order={2}>Not delivered</Title>
+								</Accordion.Control>
+								<Accordion.Panel>
+									{notVisited.map(([item, itemIndex]) => (
+										<ItemSmall
+											key={itemIndex}
+											item={item}
+											onAction={() => visit(itemIndex)}
+											icon={
+												<IconCheck style={{ height: "70%", width: "70%" }} />
+											}
+										/>
+									))}
+								</Accordion.Panel>
+							</Accordion.Item>
+						</Accordion>
 					)}
 					{visited.length > 0 && (
-						<>
-							<Title order={2}>Delivered</Title>
-							{visited.map(([{ shelfLocation: position }, itemIndex]) => (
-								<Paper
-									style={{ width: "100%" }}
-									p="sm"
-									withBorder
-									key={itemIndex}
-								>
-									<Group justify="space-between">
-										<Group>
-											<IconCheck />
-											{shelfLocationString(position)}
-										</Group>
-										<ActionIcon color="blue" onClick={() => unvisit(itemIndex)}>
-											<IconArrowBackUp />
-										</ActionIcon>
-									</Group>
-								</Paper>
-							))}
-						</>
+						<Accordion>
+							<Accordion.Item value="0">
+								<Accordion.Control>
+									<Title order={2}>Delivered</Title>
+								</Accordion.Control>
+								<Accordion.Panel>
+									{visited.map(([item, itemIndex]) => (
+										<ItemSmall
+											key={itemIndex}
+											item={item}
+											onAction={() => unvisit(itemIndex)}
+											icon={
+												<IconCheck style={{ height: "70%", width: "70%" }} />
+											}
+										/>
+									))}
+								</Accordion.Panel>
+							</Accordion.Item>
+						</Accordion>
 					)}
 				</Stack>
 			</Group>

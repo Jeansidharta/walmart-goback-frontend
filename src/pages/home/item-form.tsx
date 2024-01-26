@@ -4,26 +4,10 @@ import { WebcamCapture } from "../../components/webcam-capture";
 import { useForm } from "@mantine/form";
 
 import { ShelfLocation } from "../../models";
-import { isShelfLocationImplemented } from "../../utils/shelf-location";
-
-const positionRegex = /^(\w)(\d{1,2})\D+(\d{1,3})\D?(\d*)$/;
-
-function parseLocation(positionRaw: string): ShelfLocation | null {
-	const position = positionRaw.trim();
-	const result = positionRegex.exec(position);
-	if (!result) return null;
-	const [, section_raw, corridor_raw, shelf_raw, subshelf_raw] = result;
-	const section = section_raw.toUpperCase();
-	const corridor = Number(corridor_raw);
-	const shelf = Number(shelf_raw);
-	const subshelf = subshelf_raw ? Number(subshelf_raw) : undefined;
-	return {
-		section,
-		corridor,
-		shelf,
-		subshelf,
-	};
-}
+import {
+	isCorridorImplemented,
+	stringToLocation,
+} from "../../utils/shelf-location";
 
 type FormData = {
 	shelfLocation: string;
@@ -45,9 +29,9 @@ export const ItemForm: FC<{
 		},
 		validate: {
 			shelfLocation: (pos) => {
-				const result = parseLocation(pos);
+				const result = stringToLocation(pos);
 				if (!result) return "Invalid position";
-				if (!isShelfLocationImplemented(result)) {
+				if (!isCorridorImplemented(result)) {
 					return "This corridor was not implemented";
 				}
 			},
@@ -61,7 +45,7 @@ export const ItemForm: FC<{
 			return;
 		}
 
-		const position = parseLocation(data.shelfLocation)!;
+		const position = stringToLocation(data.shelfLocation)!;
 
 		onSubmit({
 			shelfLocation: position,

@@ -39,7 +39,7 @@ export const Map: FC<{
 				onClick={() => setIsSizedUp(false)}
 			>
 				<svg
-					viewBox="0 0 3300 2550"
+					viewBox="0 0 2796.8547 1681.7852"
 					xmlns="http://www.w3.org/2000/svg"
 					version="1.1"
 					style={{

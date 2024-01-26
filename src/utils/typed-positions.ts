@@ -6,6 +6,11 @@ export const positionsJson = positions_raw as Record<
 		average_position: { x: number; y: number };
 		name: string;
 		section: string;
+		route_projection: {
+			connection: { i1: number; i2: number };
+			t: number;
+			point: { x: number; y: number };
+		};
 		shelves: Record<
 			string,
 			{
