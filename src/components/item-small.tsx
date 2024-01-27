@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState } from "react";
-import { Item } from "../models";
+import { Item } from "../models/index.ts";
 import { ActionIcon, Group, Paper, Image, Text, Modal } from "@mantine/core";
-import { shelfLocationString } from "../utils/shelf-location";
+import { shelfLocationString } from "../utils/shelf-location.ts";
 
 export const ItemSmall: FC<{
 	item: Item;

@@ -12,7 +12,7 @@ import {
 import { IconEdit, IconCheck, IconRefresh } from "@tabler/icons-react";
 import { Item } from "../../../models";
 import { Solution } from "../page";
-import { SolutionMap } from "../solution-map";
+import { SolutionMap } from "./solution-map";
 import { NextItemCard } from "./next-item-card";
 import { ItemSmall } from "../../../components/item-small";
 
@@ -36,7 +36,7 @@ export const RouteSolution: FC<{
 		setVisitedDict({});
 	}, [solution, setVisitedDict]);
 
-	const [visited, notVisited, alsoInThisIsle] = useMemo(() => {
+	const [visited, notVisited, alsoInThisAisle] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
 		solution.route.forEach(({ item }, index) => {
@@ -47,7 +47,7 @@ export const RouteSolution: FC<{
 			}
 		});
 
-		const alsoInThisIsle: [Item, number][] = [];
+		const alsoInThisAisle: [Item, number][] = [];
 		for (let i = 0; i < notVisitedItems.length; i++) {
 			const [item, index] = notVisitedItems[i];
 			if (i === 0) continue;
@@ -57,11 +57,11 @@ export const RouteSolution: FC<{
 				item.shelfLocation.corridor ===
 				notVisitedItems[0][0].shelfLocation.corridor
 			) {
-				alsoInThisIsle.push([item, index]);
+				alsoInThisAisle.push([item, index]);
 			}
 		}
 
-		return [visitedItems, notVisitedItems, alsoInThisIsle] as const;
+		return [visitedItems, notVisitedItems, alsoInThisAisle] as const;
 	}, [solution, visitedDict]);
 
 	const [nextItem, nextItemIndex] =
@@ -69,7 +69,7 @@ export const RouteSolution: FC<{
 
 	return (
 		<Stack>
-			<SolutionMap solution={solution} currentIndex={nextItemIndex ?? 0} />
+			<SolutionMap solution={solution} currentIndex={nextItemIndex} />
 			<Group justify="center" align="start">
 				<Stack>
 					<Paper withBorder p="md">
@@ -80,11 +80,11 @@ export const RouteSolution: FC<{
 								<Button onClick={() => visit(nextItemIndex)}>
 									Delivered <Space w="sm" /> <IconCheck />
 								</Button>
-								{alsoInThisIsle.length > 0 && (
+								{alsoInThisAisle.length > 0 && (
 									<>
 										<Divider />
-										<Title order={3}>Also in this isle...</Title>
-										{alsoInThisIsle.map(([item]) => (
+										<Title order={3}>Also in this aisle...</Title>
+										{alsoInThisAisle.map(([item]) => (
 											<NextItemCard item={item} />
 										))}
 									</>

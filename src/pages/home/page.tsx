@@ -79,8 +79,8 @@ function traceRoute(
 		}
 	}
 	const itemMap: Record<number, Item> = {};
-	Object.values(new_points_dict).forEach((isleItems) => {
-		isleItems
+	Object.values(new_points_dict).forEach((aisleItems) => {
+		aisleItems
 			.sort((i1, i2) => i1.t - i2.t)
 			.forEach(({ x, y, connection: { i1, i2 }, item }, index) => {
 				route_points.push({ x, y });
@@ -98,7 +98,7 @@ function traceRoute(
 						i2: route_points.length - 1,
 					});
 				}
-				if (index === isleItems.length - 1) {
+				if (index === aisleItems.length - 1) {
 					route_connections.push({ i1: route_points.length - 1, i2 });
 				}
 			});
