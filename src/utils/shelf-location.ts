@@ -40,7 +40,14 @@ export function isShelfLocationImplemented(location: ShelfLocation): boolean {
 }
 
 export function shelfLocationString(location: ShelfLocation) {
-	let res = location.section + location.corridor + "-" + location.shelf;
+	return (
+		location.section.toUpperCase() + location.corridor + "-" + location.shelf
+	);
+}
+
+export function subshelfLocationString(location: ShelfLocation) {
+	let res =
+		location.section.toUpperCase() + location.corridor + "-" + location.shelf;
 	if (location.subshelf) {
 		res += "-" + location.subshelf;
 	}

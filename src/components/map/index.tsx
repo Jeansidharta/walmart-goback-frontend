@@ -5,9 +5,11 @@ import styled from "styled-components";
 import style from "./styles.module.css";
 import { ActionIcon } from "@mantine/core";
 import { IconArrowsMaximize } from "@tabler/icons-react";
+import { ShelfLocation } from "../../models";
+import { shelfLocationString } from "../../utils/shelf-location";
 
 export type Point = { x: number; y: number };
-
+export type LocationHightlight = { locations: ShelfLocation[]; color: string };
 export type Dot = Point & {
 	radius?: number;
 	color?: string;
@@ -15,17 +17,36 @@ export type Dot = Point & {
 
 export type Line = { points: [Point, Point]; color?: string; width?: number };
 
-const SvgContainer = styled.div`
+const SvgContainer = styled.div<{
+	locationsHighlight?: LocationHightlight[];
+}>`
   g[inkscape\\:label="Route"] {
     visibility: hidden;
   }
+  [is-position="true"] {
+    fill: var(--color-gray-dark) !important;
+  }
+  ${({ locationsHighlight = [] }) =>
+		locationsHighlight.map(
+			({ locations, color }) => `${locations
+				.map(
+					(location) =>
+						`[is-position="true"][inkscape\\:label="${shelfLocationString(
+							location,
+						)}"]`,
+				)
+				.join(",")} {
+			fill: ${color} !important;
+		}`,
+		)}
 `;
 
 export const Map: FC<{
 	points?: Dot[];
 	lines?: Line[];
 	lineWidth?: number;
-}> = ({ points = [], lines = [], lineWidth = 5 }) => {
+	locationsHighlight?: LocationHightlight[];
+}> = ({ points = [], lines = [], lineWidth = 5, locationsHighlight = [] }) => {
 	const [isSizedUp, setIsSizedUp] = useState(false);
 
 	return (
@@ -78,7 +99,10 @@ export const Map: FC<{
 						),
 					)}
 				</svg>
-				<SvgContainer dangerouslySetInnerHTML={{ __html: PlantSvg }} />
+				<SvgContainer
+					locationsHighlight={locationsHighlight}
+					dangerouslySetInnerHTML={{ __html: PlantSvg }}
+				/>
 				<ActionIcon
 					style={{
 						position: "absolute",

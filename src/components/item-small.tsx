@@ -1,7 +1,7 @@
 import { FC, ReactNode, useState } from "react";
 import { Item } from "../models/index.ts";
 import { ActionIcon, Group, Paper, Image, Text, Modal } from "@mantine/core";
-import { shelfLocationString } from "../utils/shelf-location.ts";
+import { subshelfLocationString } from "../utils/shelf-location.ts";
 
 export const ItemSmall: FC<{
 	item: Item;
@@ -13,7 +13,7 @@ export const ItemSmall: FC<{
 		<Paper style={{ width: "100%" }} p="sm" withBorder>
 			<Group justify="space-between">
 				<Image onClick={() => setZoomImage(true)} w={40} h={40} src={photo} />
-				<Text style={{ flex: 1 }}>{shelfLocationString(shelfLocation)}</Text>
+				<Text style={{ flex: 1 }}>{subshelfLocationString(shelfLocation)}</Text>
 				<ActionIcon color="secondary" variant="outline" onClick={onAction}>
 					{icon}
 				</ActionIcon>

@@ -1,18 +1,27 @@
 import { FC } from "react";
-import { Line, Map } from "../../../components/map";
+import { Line, LocationHightlight, Map, Dot } from "../../../components/map";
 import { Solution } from "../page";
 
 export const SolutionMap: FC<{
 	solution: Solution;
 	currentIndex: number | null;
 }> = ({ solution, currentIndex }) => {
-	const points = (solution?.route ?? []).map(({ item: { x, y } }) => {
-		return {
-			x,
-			y,
-			radius: 10,
-			color: "gray",
-		};
+	const locationHighlight: LocationHightlight = {
+		color: "var(--color-secondary-light)",
+		locations: [],
+	};
+	const points: Dot[] = [];
+	(solution?.route ?? []).forEach(({ item: { x, y, shelfLocation } }) => {
+		if (shelfLocation.corridor) {
+			locationHighlight.locations.push(shelfLocation);
+		} else {
+			points.push({
+				x,
+				y,
+				radius: 10,
+				color: "var(--color-secondary-light)",
+			});
+		}
 	});
 
 	const lines: Line[] = [];
@@ -25,8 +34,8 @@ export const SolutionMap: FC<{
 					{ x: prev_point.x, y: prev_point.y },
 					{ x, y },
 				],
-				width: 3,
-				color: "gray",
+				width: 10,
+				color: "var(--color-secondary-light)",
 			});
 			prev_point = point;
 		});
@@ -55,12 +64,18 @@ export const SolutionMap: FC<{
 					{ x: prev_point.x, y: prev_point.y },
 					{ x, y },
 				],
-				width: 5,
+				width: 10,
 				color: "var(--color-primary)",
 			});
 			prev_point = point;
 		});
 	}
 
-	return <Map points={points} lines={lines} />;
+	return (
+		<Map
+			points={points}
+			lines={lines}
+			locationsHighlight={[locationHighlight]}
+		/>
+	);
 };

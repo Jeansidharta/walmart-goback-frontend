@@ -1,13 +1,13 @@
 import { FC } from "react";
 import { Item } from "../../../models";
 import { Group, Image, Stack, Text } from "@mantine/core";
-import { shelfLocationString } from "../../../utils/shelf-location";
+import { subshelfLocationString } from "../../../utils/shelf-location";
 
 export const NextItemCard: FC<{ item: Item }> = ({ item }) => {
 	return (
 		<Stack>
 			<Text>
-				Location: <strong>{shelfLocationString(item.shelfLocation)}</strong>
+				Location: <strong>{subshelfLocationString(item.shelfLocation)}</strong>
 			</Text>
 
 			<Group

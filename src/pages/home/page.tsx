@@ -151,7 +151,7 @@ export const HomePage: FC = () => {
 				/>
 			) : (
 				<>
-					<PreviewMap />
+					<PreviewMap locations={items.map((item) => item.shelfLocation)} />
 					<Group align="start" justify="center" style={{ rowGap: 32 }}>
 						<ItemForm
 							onSubmit={(newItem) =>

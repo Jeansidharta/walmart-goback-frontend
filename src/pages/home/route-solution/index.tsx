@@ -6,7 +6,6 @@ import {
 	Title,
 	Button,
 	Space,
-	Divider,
 	Accordion,
 } from "@mantine/core";
 import { IconEdit, IconCheck, IconRefresh } from "@tabler/icons-react";
@@ -36,7 +35,7 @@ export const RouteSolution: FC<{
 		setVisitedDict({});
 	}, [solution, setVisitedDict]);
 
-	const [visited, notVisited, alsoInThisAisle] = useMemo(() => {
+	const [visited, notVisited] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
 		solution.route.forEach(({ item }, index) => {
@@ -47,21 +46,7 @@ export const RouteSolution: FC<{
 			}
 		});
 
-		const alsoInThisAisle: [Item, number][] = [];
-		for (let i = 0; i < notVisitedItems.length; i++) {
-			const [item, index] = notVisitedItems[i];
-			if (i === 0) continue;
-			if (
-				item.shelfLocation.section ===
-				notVisitedItems[0][0].shelfLocation.section &&
-				item.shelfLocation.corridor ===
-				notVisitedItems[0][0].shelfLocation.corridor
-			) {
-				alsoInThisAisle.push([item, index]);
-			}
-		}
-
-		return [visitedItems, notVisitedItems, alsoInThisAisle] as const;
+		return [visitedItems, notVisitedItems] as const;
 	}, [solution, visitedDict]);
 
 	const [nextItem, nextItemIndex] =
@@ -80,15 +65,6 @@ export const RouteSolution: FC<{
 								<Button onClick={() => visit(nextItemIndex)}>
 									Delivered <Space w="sm" /> <IconCheck />
 								</Button>
-								{alsoInThisAisle.length > 0 && (
-									<>
-										<Divider />
-										<Title order={3}>Also in this aisle...</Title>
-										{alsoInThisAisle.map(([item]) => (
-											<NextItemCard item={item} />
-										))}
-									</>
-								)}
 							</Stack>
 						) : (
 							<>
