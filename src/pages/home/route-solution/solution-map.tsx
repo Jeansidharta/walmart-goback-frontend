@@ -1,11 +1,18 @@
 import { FC } from "react";
-import { Line, LocationHightlight, Map, Dot } from "../../../components/map";
+import {
+	Line,
+	LocationHightlight,
+	Map,
+	Dot,
+	BoundingBox,
+} from "../../../components/map";
 import { Solution } from "../page";
 
 export const SolutionMap: FC<{
 	solution: Solution;
 	currentIndex: number | null;
-}> = ({ solution, currentIndex }) => {
+	boundingBox: BoundingBox;
+}> = ({ solution, currentIndex, boundingBox }) => {
 	const locationHighlight: LocationHightlight = {
 		color: "var(--color-secondary-light)",
 		locations: [],
@@ -76,6 +83,7 @@ export const SolutionMap: FC<{
 			points={points}
 			lines={lines}
 			locationsHighlight={[locationHighlight]}
+			boundingBox={boundingBox}
 		/>
 	);
 };

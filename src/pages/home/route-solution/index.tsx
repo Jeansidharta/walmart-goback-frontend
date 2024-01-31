@@ -14,6 +14,32 @@ import { Solution } from "../page";
 import { SolutionMap } from "./solution-map";
 import { NextItemCard } from "./next-item-card";
 import { ItemSmall } from "../../../components/item-small";
+import { BoundingBox, Point } from "../../../components/map";
+
+function getPointsViewBox(points: Point[]): BoundingBox {
+	return points.reduce<BoundingBox>(
+		(boundingBox, point) => {
+			if (point.x < boundingBox.topLeft.x) {
+				boundingBox.topLeft.x = point.x;
+			}
+			if (point.y < boundingBox.topLeft.y) {
+				boundingBox.topLeft.y = point.y;
+			}
+			if (point.x > boundingBox.bottomRight.x) {
+				boundingBox.bottomRight.x = point.x;
+			}
+			if (point.y > boundingBox.bottomRight.y) {
+				boundingBox.bottomRight.y = point.y;
+			}
+			return boundingBox;
+		},
+
+		{
+			topLeft: { x: Infinity, y: Infinity },
+			bottomRight: { x: -Infinity, y: -Infinity },
+		},
+	);
+}
 
 export const RouteSolution: FC<{
 	solution: Solution;
@@ -35,7 +61,7 @@ export const RouteSolution: FC<{
 		setVisitedDict({});
 	}, [solution, setVisitedDict]);
 
-	const [visited, notVisited] = useMemo(() => {
+	const [visited, notVisited, boundingBox] = useMemo(() => {
 		const visitedItems: [Item, number][] = [];
 		const notVisitedItems: [Item, number][] = [];
 		solution.route.forEach(({ item }, index) => {
@@ -46,7 +72,11 @@ export const RouteSolution: FC<{
 			}
 		});
 
-		return [visitedItems, notVisitedItems] as const;
+		return [
+			visitedItems,
+			notVisitedItems,
+			getPointsViewBox(solution.route.flatMap(({ path }) => path)),
+		] as const;
 	}, [solution, visitedDict]);
 
 	const [nextItem, nextItemIndex] =
@@ -54,7 +84,11 @@ export const RouteSolution: FC<{
 
 	return (
 		<Stack>
-			<SolutionMap solution={solution} currentIndex={nextItemIndex} />
+			<SolutionMap
+				solution={solution}
+				currentIndex={nextItemIndex}
+				boundingBox={boundingBox}
+			/>
 			<Group justify="center" align="start">
 				<Stack>
 					<Paper withBorder p="md">
