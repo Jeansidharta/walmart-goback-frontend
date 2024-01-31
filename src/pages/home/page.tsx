@@ -4,7 +4,7 @@ import {
 	Vec2,
 	solve as tspSolve,
 } from "../../../tsp-pkg/travelling_salesman";
-import { Group, Text, Stack, Container } from "@mantine/core";
+import { Group, Text, Stack, Container, Button, Space } from "@mantine/core";
 import { ItemForm } from "./item-form";
 import { RouteSolution } from "./route-solution";
 import { useLocalStorage } from "../../utils/use-local-storage";
@@ -190,6 +190,11 @@ export const HomePage: FC = () => {
 												}
 											/>
 										))}
+										<Button onClick={() => setItems([])}>
+											Clear all items
+											<Space w="xs" />
+											<IconTrash style={{ height: "70%", width: "70%" }} />
+										</Button>
 									</>
 								)}
 							</Stack>
