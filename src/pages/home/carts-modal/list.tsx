@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { fetcher } from "../../../utils/fetcher";
 import ago from "s-ago";
-import { IconReload, IconShoppingCart, IconTrash } from "@tabler/icons-react";
+import { IconShoppingCart, IconTrash } from "@tabler/icons-react";
 import { useTriggerRefresh } from "../../../utils/use-trigger-refresh";
 
 type Cart = {

@@ -40,6 +40,7 @@ export const ShareButton: FC<{ items: Item[] }> = ({ items }) => {
 				items: items.map((item) => ({
 					...item.shelfLocation,
 					photo: item.photo,
+					is_cold: item.isCold,
 				})),
 			});
 			setCartId(response.data.data.cart.id.toString());

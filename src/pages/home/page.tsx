@@ -182,7 +182,9 @@ export const HomePage: FC = () => {
 								{items.length === 0 ? (
 									<>
 										<Text>No items yet</Text>
-										<CartsModal onScan={(newItems) => setItems(newItems)} />
+										<CartsModal
+											onScan={(_cart, newItems) => setItems(newItems)}
+										/>
 									</>
 								) : (
 									<>

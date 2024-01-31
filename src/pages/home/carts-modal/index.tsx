@@ -1,15 +1,20 @@
 import { ActionIcon, Modal, Text } from "@mantine/core";
-import { IconQrcode } from "@tabler/icons-react";
 import { FC, useState } from "react";
 import { Item, ShelfLocation } from "../../../models";
 import { ScanCamera } from "./scan-camera";
 import { SavedCartsList } from "./list";
 import { fetcher } from "../../../utils/fetcher";
 import { shelfLocationToPosition } from "../../../utils/shelf-location";
+import { IconQrcode } from "@tabler/icons-react";
 
-export const CartsModal: FC<{ onScan: (newItems: Item[]) => void }> = ({
-	onScan,
-}) => {
+export type Cart = {
+	id: number;
+	name: string;
+};
+
+export const CartsModal: FC<{
+	onScan: (cart: Cart, newItems: Item[]) => void;
+}> = ({ onScan }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -24,12 +29,13 @@ export const CartsModal: FC<{ onScan: (newItems: Item[]) => void }> = ({
 				.method("get")
 				.create()({ cart_id });
 
-			const items = response.data.data.items;
+			const { items, cart } = response.data.data;
 			if (items.length === 0) {
 				setError("It seems this cart was empty");
 				return;
 			}
 			onScan(
+				cart,
 				items.map((item) => {
 					const location: ShelfLocation = {
 						section: item.section,
@@ -45,6 +51,7 @@ export const CartsModal: FC<{ onScan: (newItems: Item[]) => void }> = ({
 						shelfLocation: location,
 						x,
 						y,
+						isCold: item.is_cold === 0 ? false : true,
 					};
 				}),
 			);
