@@ -70,7 +70,6 @@ export const Map: FC<{
 }) => {
 		const svgRef = useRef<SVGElement | null>(null);
 		const [isSizedUp, setIsSizedUp] = useState(false);
-		console.log(boundingBoxToViewBox(boundingBox));
 
 		useEffect(() => {
 			if (!svgRef.current) return;

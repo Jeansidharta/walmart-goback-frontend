@@ -10,4 +10,5 @@ export type Item = {
 	x: number;
 	y: number;
 	photo: string;
+	isCold: boolean;
 };

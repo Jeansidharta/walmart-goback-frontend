@@ -135,7 +135,20 @@ export const HomePage: FC = () => {
 	}
 
 	function handleTraceRoute(startLocation: ShelfLocation | null) {
-		setSolution(traceRoute(items, startLocation));
+		const coldRoute = traceRoute(
+			items.filter((i) => i.isCold),
+			startLocation,
+		);
+		const normalRoute = traceRoute(
+			items.filter((i) => !i.isCold),
+			coldRoute.route[coldRoute.route.length - 1]?.item?.shelfLocation ??
+			startLocation,
+		);
+		const route: Solution = {
+			initialPosition: coldRoute.initialPosition,
+			route: coldRoute.route.concat(normalRoute.route),
+		};
+		setSolution(route);
 	}
 
 	return (
