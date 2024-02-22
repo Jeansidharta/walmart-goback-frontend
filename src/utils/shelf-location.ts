@@ -54,7 +54,7 @@ export function subshelfLocationString(location: ShelfLocation) {
 	return res;
 }
 
-const positionRegex = /^(\w\w?)(\d{1,2})\D+(\d{1,3})\D?(\d*)$/;
+const positionRegex = /^([a-zA-Z]{1,2})(\d{1,2})\D+(\d{1,3})\D?(\d*)$/;
 
 export function stringToLocation(str: string): null | ShelfLocation {
 	const position = str.trim();
